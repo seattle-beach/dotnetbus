@@ -24,5 +24,13 @@ namespace dotnetbus_web.Tests.Controllers
             var viewModel = (StopResponseData)result.Model;
             Assert.AreSame(stopResponse.data, viewModel);
         }
+
+        [TestMethod]
+        public void Index_EmptyStopId_Redirects()
+        {
+            var subject = new StopController(null);
+            var result = (RedirectResult)subject.Index("");
+            Assert.AreEqual("/", result.Url);
+        }
     }
 }

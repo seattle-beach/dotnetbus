@@ -22,7 +22,11 @@ namespace dotnetbus_web.Controllers
         // GET: Stop
         public ActionResult Index(string stopId)
         {
-            // TODO: make sure the stopid was passed
+            if (String.IsNullOrEmpty(stopId))
+            {
+                return new RedirectResult("/");
+            }
+
             var task = _stopService.DeparturesForStopAsync(stopId);
             task.Wait();
             return View(task.Result.data);
