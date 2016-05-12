@@ -1,0 +1,32 @@
+﻿@model dotnetbus_web.ViewModels.StopViewModel
+@{
+    ViewBag.Title = "index";
+}
+
+<h2>Stop @Model.stopId</h2>
+Latitude: @Model.Latitude<br />
+Longitude: @Model.Longitude<br />
+
+<table>
+    <thead>
+        <tr>
+            <th>Route</th>
+            <th>Temperature</th>
+            <th>Climate</th>
+            <th>Predicted time</th>
+            <th>Scheduled time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.departures)
+        {
+            <tr>
+                <td>@d.routeShortName @d.headsign</td>
+                <td>@d.temp</td>
+                <td><img src="@d.climacon_url" alt="@d.climacon" /></td>
+                <td>@d.predictedTime</td>
+                <td>@d.scheduledTime</td>
+            </tr>
+        }
+    </tbody>
+</table>

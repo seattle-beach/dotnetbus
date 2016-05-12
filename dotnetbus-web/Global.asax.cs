@@ -16,6 +16,8 @@ namespace dotnetbus_web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            IControllerFactory factory = new ControllerFactory();
+            ControllerBuilder.Current.SetControllerFactory(factory);
         }
     }
 }
