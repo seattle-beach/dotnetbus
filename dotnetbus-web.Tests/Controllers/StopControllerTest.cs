@@ -3,8 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net.Http;
 using dotnetbus_web.Controllers;
 using System.Net;
-using dotnetbus_web.ViewModels;
 using System.Web.Mvc;
+using dotnetbus_web.Models;
 
 namespace dotnetbus_web.Tests.Controllers
 {
@@ -42,7 +42,7 @@ namespace dotnetbus_web.Tests.Controllers
             var subject = new StopController(client);
 
             var result = (ViewResult)subject.Index("1_619");
-            var viewModel = (StopViewModel)result.Model;
+            var viewModel = (StopResponseData)result.Model;
             Assert.IsTrue(viewModel.Latitude > 47.599826 && viewModel.Latitude < 47.599828);
             Assert.IsTrue(viewModel.Longitude > -122.328973 && viewModel.Longitude < 122.328971);
             Assert.AreEqual(viewModel.departures.Count, 1);

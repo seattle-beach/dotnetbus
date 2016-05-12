@@ -1,11 +1,11 @@
-﻿@model dotnetbus_web.ViewModels.StopViewModel
+﻿@model dotnetbus_web.Models.StopResponseData
 @{
     ViewBag.Title = "index";
 }
 
 <h2>Stop @Model.stopId</h2>
-Latitude: @Model.Latitude<br />
-Longitude: @Model.Longitude<br />
+Latitude: @Model.latitude<br />
+Longitude: @Model.longitude<br />
 
 <table>
     <thead>
