@@ -6,38 +6,26 @@ using System.Web.Mvc;
 using System.Net.Http;
 using Newtonsoft.Json;
 using dotnetbus_web.Models;
+using dotnetbus_web.Services;
 
 namespace dotnetbus_web.Controllers
 {
     public class StopController : Controller
     {
-        private HttpClient _httpClient;
+        private StopService _stopService;
 
-        public StopController(HttpClient c)
+        public StopController(StopService c)
         {
-            _httpClient = c;
+            _stopService = c;
         }
 
         // GET: Stop
         public ActionResult Index(string stopId)
         {
             // TODO: make sure the stopid was passed
-            _httpClient.BaseAddress = new Uri("http://weatherbus-prime-dev.cfapps.io/");
-            string path = String.Format("/api/v1/stops/{0}", stopId);
-            StopResponse stopResponse = null;
-
-            var task = _httpClient.GetAsync(path)
-                .ContinueWith((taskWithResponse) =>
-                {
-                    // TODO: check status code etc
-                    var bt = taskWithResponse.Result.Content.ReadAsStringAsync();
-                    bt.Wait();
-                    Console.WriteLine("Stop response: {0}", bt.Result);
-                    stopResponse = JsonConvert.DeserializeObject<StopResponse>(bt.Result);
-                });
+            var task = _stopService.DeparturesForStopAsync(stopId);
             task.Wait();
-
-            return View(stopResponse.data);
+            return View(task.Result.data);
         }
     }
 }

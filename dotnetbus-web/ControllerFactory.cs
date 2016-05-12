@@ -1,4 +1,5 @@
 ﻿using dotnetbus_web.Controllers;
+using dotnetbus_web.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,9 @@ namespace dotnetbus_web
 
             if (controllerType == typeof(StopController))
             {
-                return new StopController(new HttpClient());
+                var httpClient = new HttpClient();
+                httpClient.BaseAddress = new Uri("http://weatherbus-prime-dev.cfapps.io/");
+                return new StopController(new StopService(httpClient));
             }
 
             return base.GetControllerInstance(requestContext, controllerType);
