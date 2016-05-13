@@ -1,4 +1,5 @@
 ﻿using dotnetbus_web.Models;
+using Microsoft.Practices.Unity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace dotnetbus_web.Services
     {
         private HttpClient _httpClient;
 
-        public StopService(HttpClient c)
+        public StopService([Dependency("weatherbus-prime")] HttpClient c)
         {
             _httpClient = c;
         }
