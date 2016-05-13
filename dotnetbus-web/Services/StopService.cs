@@ -9,6 +9,13 @@ using System.Web;
 
 namespace dotnetbus_web.Services
 {
+    public class NoSuchStopException : Exception
+    {
+        public NoSuchStopException() 
+            : base("No such stop")
+        {
+        }
+    }
     public class StopService
     {
         private HttpClient _httpClient;
@@ -25,8 +32,16 @@ namespace dotnetbus_web.Services
             await task.ConfigureAwait(false);
             return await task.ContinueWith((taskWithResponse) =>
                 {
-                    // TODO: check status code etc
-                    var bt = taskWithResponse.Result.Content.ReadAsStringAsync();
+                    var response = taskWithResponse.Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        // The API doesn't give us enough information to determine the cause of the error,
+                        // so assume that it's a bad stop ID.
+                        throw new NoSuchStopException();
+                    }
+
+                    var bt = response.Content.ReadAsStringAsync();
                     bt.Wait();
                     Console.WriteLine("Stop response: {0}", bt.Result);
                     return JsonConvert.DeserializeObject<StopResponse>(bt.Result);

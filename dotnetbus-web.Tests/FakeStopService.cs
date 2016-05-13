@@ -12,6 +12,8 @@ namespace dotnetbus_web.Tests
     {
         public Dictionary<String, StopResponse> StopResponses { get; private set; }
 
+        public Exception Throws { get; set; }
+
         public FakeStopService() : base(null)
         {
             StopResponses = new Dictionary<string, StopResponse>();
@@ -19,6 +21,11 @@ namespace dotnetbus_web.Tests
 
         public override async Task<StopResponse> DeparturesForStopAsync(string stopId)
         {
+            if (Throws != null)
+            {
+                throw Throws;
+            }
+
             if (!StopResponses.ContainsKey(stopId))
             {
                 throw new Exception(String.Format("No response configured for stop ID {0}", stopId));

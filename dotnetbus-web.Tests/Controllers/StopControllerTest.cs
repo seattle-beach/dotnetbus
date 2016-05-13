@@ -6,6 +6,7 @@ using System.Net;
 using System.Web.Mvc;
 using dotnetbus_web.Models;
 using System.Collections.Generic;
+using dotnetbus_web.Services;
 
 namespace dotnetbus_web.Tests.Controllers
 {
@@ -31,6 +32,17 @@ namespace dotnetbus_web.Tests.Controllers
             var subject = new StopController(null);
             var result = (RedirectResult)subject.Index("");
             Assert.AreEqual("/", result.Url);
+        }
+
+        [TestMethod]
+        public void Index_NoSuchStop()
+        {
+            var svc = new FakeStopService();
+            svc.Throws = new NoSuchStopException();
+            var subject = new StopController(svc);
+
+            var result = (ViewResult)subject.Index("1_619");
+            Assert.AreEqual("nostop", result.ViewName);
         }
     }
 }

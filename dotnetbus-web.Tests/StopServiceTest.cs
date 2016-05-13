@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net.Http;
 using dotnetbus_web.Services;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace dotnetbus_web.Tests
 {
@@ -54,6 +55,32 @@ namespace dotnetbus_web.Tests
             Assert.AreEqual(d.headsign, "NORTHGATE FREMONT");
             Assert.AreEqual(d.predictedTime, 0);
             Assert.AreEqual(d.scheduledTime, 1463078707000);
+        }
+
+        [TestMethod]
+        public async Task TestDeparturesForStopAsync_non_200()
+        {
+            var handler = new FakeHttpResponseHandler();
+            var response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            response.Content = new FakeHttpContent("{\"nope?\": \"nope.\"}");
+            var url = new Uri("http://example.com/api/v1/stops/1_619");
+            handler.responses[url] = response;
+    
+            var client = new HttpClient(handler);
+            client.BaseAddress = new Uri("http://example.com/");
+            var subject = new StopService(client);
+            bool thrown = false;
+
+            try
+            {
+                await subject.DeparturesForStopAsync("1_619");
+            }
+            catch (NoSuchStopException)
+            {
+                thrown = true;
+            }
+
+            Assert.IsTrue(thrown);
         }
     }
 }

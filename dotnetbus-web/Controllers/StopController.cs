@@ -27,9 +27,23 @@ namespace dotnetbus_web.Controllers
                 return new RedirectResult("/");
             }
 
-            var task = _stopService.DeparturesForStopAsync(stopId);
-            task.Wait();
-            return View(task.Result.data);
+            try
+            {
+                var task = _stopService.DeparturesForStopAsync(stopId);
+                task.Wait();
+                return View(task.Result.data);
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is NoSuchStopException)
+                {
+                    return View("nostop");
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
     }
 }
