@@ -128,6 +128,7 @@
     </Compile>
     <Compile Include="Models\StopResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IStopService.cs" />
     <Compile Include="Services\StopService.cs" />
   </ItemGroup>
   <ItemGroup>

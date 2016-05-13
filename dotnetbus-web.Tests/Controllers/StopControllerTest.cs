@@ -7,6 +7,8 @@ using System.Web.Mvc;
 using dotnetbus_web.Models;
 using System.Collections.Generic;
 using dotnetbus_web.Services;
+using Moq;
+using System.Threading.Tasks;
 
 namespace dotnetbus_web.Tests.Controllers
 {
@@ -16,10 +18,11 @@ namespace dotnetbus_web.Tests.Controllers
         [TestMethod]
         public void Index_RetrievesStop()
         {
-            var svc = new FakeStopService();
+            var svc = new Mock<IStopService>();
             var stopResponse = new StopResponse { data = new StopResponseData() };
-            svc.StopResponses["1_619"] = stopResponse;
-            var subject = new StopController(svc);
+            svc.Setup(x => x.DeparturesForStopAsync("1_619"))
+                .ReturnsAsync(stopResponse);
+            var subject = new StopController(svc.Object);
 
             var result = (ViewResult)subject.Index("1_619");
             var viewModel = (StopResponseData)result.Model;
@@ -37,9 +40,10 @@ namespace dotnetbus_web.Tests.Controllers
         [TestMethod]
         public void Index_NoSuchStop()
         {
-            var svc = new FakeStopService();
-            svc.Throws = new NoSuchStopException();
-            var subject = new StopController(svc);
+            var svc = new Mock<IStopService>();
+            svc.Setup(x => x.DeparturesForStopAsync("1_619"))
+                .ThrowsAsync(new NoSuchStopException());
+            var subject = new StopController(svc.Object);
 
             var result = (ViewResult)subject.Index("1_619");
             Assert.AreEqual("nostop", result.ViewName);

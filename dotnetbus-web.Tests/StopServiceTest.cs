@@ -4,17 +4,34 @@ using System.Net.Http;
 using dotnetbus_web.Services;
 using System.Net;
 using System.Threading.Tasks;
+using Moq;
+using Moq.Protected;
+using System.Threading;
 
 namespace dotnetbus_web.Tests
 {
     [TestClass]
     public class StopServiceTest
     {
+        private Mock<DelegatingHandler> mockHandlerWithResponse(Uri url, HttpStatusCode status, string body)
+        {
+            var response = new HttpResponseMessage(status);
+            response.Content = new FakeHttpContent(body);
+            var handler = new Mock<DelegatingHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns(() => Task.FromResult(response))
+                .Callback<HttpRequestMessage, CancellationToken>((req, cancel) =>
+                {
+                    Assert.AreEqual(url, req.RequestUri);
+                });
+
+            return handler;
+        }
+
         [TestMethod]
         public void TestDeparturesForStopAsync_success()
         {
-            var handler = new FakeHttpResponseHandler();
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
             string json = @"{  
                ""data"":{  
                   ""latitude"":47.599827,
@@ -33,11 +50,10 @@ namespace dotnetbus_web.Tests
                   ]
                }
             }";
-            response.Content = new FakeHttpContent(json);
-            var url = new Uri("http://example.com/api/v1/stops/1_619");
-            handler.responses[url] = response;
 
-            var client = new HttpClient(handler);
+            var handler = mockHandlerWithResponse(new Uri("http://example.com/api/v1/stops/1_619"),
+                HttpStatusCode.OK, json);
+            var client = new HttpClient(handler.Object);
             client.BaseAddress = new Uri("http://example.com/");
             var subject = new StopService(client);
 
@@ -55,18 +71,16 @@ namespace dotnetbus_web.Tests
             Assert.AreEqual(d.headsign, "NORTHGATE FREMONT");
             Assert.AreEqual(d.predictedTime, 0);
             Assert.AreEqual(d.scheduledTime, 1463078707000);
+            //Assert.AreEqual(new Uri("http://example.com/api/v1/stops/1_619"), request.RequestUri);
         }
 
         [TestMethod]
         public async Task TestDeparturesForStopAsync_non_200()
         {
-            var handler = new FakeHttpResponseHandler();
-            var response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-            response.Content = new FakeHttpContent("{\"nope?\": \"nope.\"}");
-            var url = new Uri("http://example.com/api/v1/stops/1_619");
-            handler.responses[url] = response;
-    
-            var client = new HttpClient(handler);
+            var handler = mockHandlerWithResponse(new Uri("http://example.com/api/v1/stops/1_619"),
+                HttpStatusCode.InternalServerError, "{\"nope?\": \"nope.\"}");
+
+            var client = new HttpClient(handler.Object);
             client.BaseAddress = new Uri("http://example.com/");
             var subject = new StopService(client);
             bool thrown = false;

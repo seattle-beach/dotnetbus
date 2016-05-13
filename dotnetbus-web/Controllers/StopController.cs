@@ -12,9 +12,9 @@ namespace dotnetbus_web.Controllers
 {
     public class StopController : Controller
     {
-        private StopService _stopService;
+        private IStopService _stopService;
 
-        public StopController(StopService c)
+        public StopController(IStopService c)
         {
             _stopService = c;
         }

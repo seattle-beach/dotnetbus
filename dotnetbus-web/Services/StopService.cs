@@ -16,7 +16,7 @@ namespace dotnetbus_web.Services
         {
         }
     }
-    public class StopService
+    public class StopService : IStopService
     {
         private HttpClient _httpClient;
 
